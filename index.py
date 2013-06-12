@@ -30,6 +30,7 @@ def main(filename):
         'tools.decode.on': True,
         'tools.trailing_slash.on': True,
         'tools.staticdir.root': os.path.abspath(os.path.dirname(__file__)),
+	'server.socket_port': 8099
         })
 
     cherrypy.quickstart(Root(data), '/', {

@@ -29,11 +29,11 @@ Q.Sprite.extend("Player",{
 
     // You can call the parent's constructor with this._super(..)
     this._super(p, {
-      sheet: "player",  // Setting a sprite sheet sets sprite width and height
+      sheet: "new_player",  // Setting a sprite sheet sets sprite width and height
       x: 410,           // You can also set additional properties that can
       y: 190             // be overridden on object creation
     });
-
+    Q.input.on("left",this,"move_left");
     // Add in pre-made components to get up and running quickly
     // The `2d` component adds in default 2d collision detection
     // and kinetics (velocity, gravity)
@@ -54,6 +54,10 @@ Q.Sprite.extend("Player",{
       }
     });
 
+  },
+  move_left: function(p){
+    console.log(this.p);
+    this.p.sheet = "new_player1";
   }
 
 });
@@ -155,13 +159,15 @@ Q.scene('endGame',function(stage) {
 // Q.load can be called at any time to load additional assets
 // assets that are already loaded will be skipped
 // The callback will be triggered when everything is loaded
-Q.load("sprites.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("sprites.png, sprites.json, level.json, tiles.png, background-wall.png, kolobok.png", function() {
   // Sprites sheets can be created manually
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
   // Or from a .json asset that defines sprite locations
   Q.compileSheets("sprites.png","sprites.json");
-
+  Q.sheet("new_player","kolobok.png", {"sx":0,"sy":0,"tilew":30,"tileh":30,"frames":1});
+  Q.sheet("new_player1","kolobok.png", {"sx":0,"sy":30,"tilew":30,"tileh":30,"frames":1});
+//  Q.sheet("player","sprites.png", { tilew: 32, tileh: 32 });
   // Finally, call stageScene to run the game
   Q.stageScene("level1");
 });
