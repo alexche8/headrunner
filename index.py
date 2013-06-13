@@ -20,6 +20,10 @@ class Root(object):
     def index(self):
         return jinja_environment.get_template('index.html').render(STATIC_URL=STATIC_URL)
 
+    @cherrypy.expose
+    def sprite(self):
+        return jinja_environment.get_template('sprite.html').render(STATIC_URL=STATIC_URL)
+
 def main(filename):
     data = {} # We'll replace this later
 
