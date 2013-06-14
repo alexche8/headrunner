@@ -79,7 +79,7 @@ Q.Sprite.extend("Enemy",{
 
     // Listen for a sprite collision, if it's the player,
     // end the game unless the enemy is hit on top
-    this.on("bump.left,bump.right,bump.bottom",function(collision) {
+    this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
       if(collision.obj.isA("Player")) { 
         Q.stageScene("endGame",1, { label: "You Died" }); 
         collision.obj.destroy();
@@ -88,12 +88,12 @@ Q.Sprite.extend("Enemy",{
 
     // If the enemy gets hit on the top, destroy it
     // and give the user a "hop"
-    this.on("bump.top",function(collision) {
-      if(collision.obj.isA("Player")) { 
-        this.destroy();
-        collision.obj.p.vy = -300;
-      }
-    });
+    //this.on("bump.top",function(collision) {
+    //  if(collision.obj.isA("Player")) { 
+    //    this.destroy();
+    //    collision.obj.p.vy = -300;
+    //  }
+    //});
   },
   update: function(dt) {
      this.trigger('prestep',dt);
@@ -101,17 +101,12 @@ Q.Sprite.extend("Enemy",{
      this.trigger('step',dt);
      this.refreshMatrix();
      Q._invoke(this.children,"frame",dt);
-     if(parseInt( this.p.x / 100) * 100 == 500){
-       this.p.vx = 100; 
+     if(parseInt( this.p.x / 100) * 100 == 600){
+       //this.p.vx = 100; 
      }
   }
 });
 
-Q.Enemy.extend("EnemyHead", {
-  init: function(p){
-     this._super(p, {});
-   }
-})
 
 // ## Level1 scene
 // Create a new scene called level 1
@@ -127,15 +122,17 @@ Q.scene("level1",function(stage) {
 
 
   // Create the player and add them to the stage
-  var player = stage.insert(new Q.Player({alesha: 20}));
+  var player = stage.insert(new Q.Player({x:40,y:20}));
 
   // Give the stage a moveable viewport and tell it
   // to follow the player.
   stage.add("viewport").follow(player);
 
   // Add in a couple of enemies
-  stage.insert(new Q.Enemy({ x: 700, y: 0 }));
-  stage.insert(new Q.EnemyHead({ x: 600, y: 0 }));
+  stage.insert(new Q.Enemy({ x: 20, y: 0, vx: 110 }));
+  stage.insert(new Q.Enemy({ x: 1050, y: 180, vx: 0 }));
+  stage.insert(new Q.Enemy({ x: 1010, y: 180, vx: 13 }));
+  stage.insert(new Q.Enemy({ x: 800, y: 180, vx: 13 }));
 
   // Finally add in the tower goal
 
