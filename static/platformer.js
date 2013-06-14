@@ -53,21 +53,8 @@ Q.Sprite.extend("Player",{
         this.destroy();
       }
     });
-
   },
-  update: function(dt) {
-     this.trigger('prestep',dt);
-     if(this.step) { this.step(dt); }
-     this.trigger('step',dt);
-     this.refreshMatrix();
-     Q._invoke(this.children,"frame",dt);
-     if(Q.inputs['left']){
-       this.p.angle -= 5;
-     }
-     else if(Q.inputs['right']){
-       this.p.angle += 5;
-     }
-  }
+  
 
 });
 
@@ -84,7 +71,7 @@ Q.Sprite.extend("Tower", {
 // Create the Enemy class to add in some baddies
 Q.Sprite.extend("Enemy",{
   init: function(p) {
-    this._super(p, { sheet: 'enemy', vx: 100 });
+    this._super(p, { sheet: 'enemy', vx: -100 });
 
     // Enemies use the Bounce AI to change direction 
     // whenver they run into something.
@@ -107,8 +94,24 @@ Q.Sprite.extend("Enemy",{
         collision.obj.p.vy = -300;
       }
     });
+  },
+  update: function(dt) {
+     this.trigger('prestep',dt);
+     if(this.step) { this.step(dt); }
+     this.trigger('step',dt);
+     this.refreshMatrix();
+     Q._invoke(this.children,"frame",dt);
+     if(parseInt( this.p.x / 100) * 100 == 500){
+       this.p.vx = 100; 
+     }
   }
 });
+
+Q.Enemy.extend("EnemyHead", {
+  init: function(p){
+     this._super(p, {});
+   }
+})
 
 // ## Level1 scene
 // Create a new scene called level 1
@@ -124,7 +127,7 @@ Q.scene("level1",function(stage) {
 
 
   // Create the player and add them to the stage
-  var player = stage.insert(new Q.Player());
+  var player = stage.insert(new Q.Player({alesha: 20}));
 
   // Give the stage a moveable viewport and tell it
   // to follow the player.
@@ -132,10 +135,9 @@ Q.scene("level1",function(stage) {
 
   // Add in a couple of enemies
   stage.insert(new Q.Enemy({ x: 700, y: 0 }));
-  stage.insert(new Q.Enemy({ x: 800, y: 0 }));
+  stage.insert(new Q.EnemyHead({ x: 600, y: 0 }));
 
   // Finally add in the tower goal
-  stage.insert(new Q.Tower({ x: 180, y: 50 }));
 
 
 
@@ -169,13 +171,13 @@ Q.scene('endGame',function(stage) {
 // Q.load can be called at any time to load additional assets
 // assets that are already loaded will be skipped
 // The callback will be triggered when everything is loaded
-Q.load("sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("jumphead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
   // Sprites sheets can be created manually
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
   // Or from a .json asset that defines sprite locations
   Q.compileSheets("sprites3.png","sprites.json");
-  Q.sheet("player","sprites3.png", {"sx":0,"sy":30,"tilew":30,"tileh":24,"frames":1});
+  Q.sheet("player","jumphead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
 
   // Finally, call stageScene to run the game
   Q.stageScene("level1");
