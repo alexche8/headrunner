@@ -98,6 +98,21 @@ Q.Sprite.extend("Enemy",{
   }
 });
 
+Q.Sprite.extend("Weapon", {
+  init: function(p){
+    this._super(p, {sheet: 'weapon'});
+    this.add("2d");
+    this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
+       if(collision.obj.isA("Player")) { 
+        Q.stageScene("endGame",1, { label: "You Died" }); 
+        collision.obj.destroy();
+      }
+    });
+
+  },
+  
+})
+
 Q.Sprite.extend("BirdHead", {
   init: function(p){
     this._super(p, { sheet: 'birdhead'});
@@ -109,6 +124,7 @@ Q.Sprite.extend("BirdHead", {
     if(int_position == this.position + 200 ||
        int_position == this.position - 200 ){
        this.p.vx = -this.p.vx;
+       this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y}))
     }
 
   }
@@ -129,8 +145,8 @@ Q.scene("level1",function(stage) {
 
 
   // Create the player and add them to the stage
-  //var player = stage.insert(new Q.Player({x:260,y:20}));
-  var player = stage.insert(new Q.Player({x:1800,y:20}));
+  var player = stage.insert(new Q.Player({x:260,y:20}));
+  //var player = stage.insert(new Q.Player({x:1800,y:20}));
 
   // Give the stage a moveable viewport and tell it
   // to follow the player.
@@ -143,6 +159,7 @@ Q.scene("level1",function(stage) {
   stage.insert(new Q.Enemy({ x: 1290, y: 203, vx: -204 }));
   stage.insert(new Q.Enemy({ x: 1335, y: 203, vx: -204 }));
   stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 2 }));
+  //stage.insert(new Q.Weapon({ x: 1770, y: 0, vx: 12 }));
 
   // Finally add in the tower goal
 
@@ -178,7 +195,7 @@ Q.scene('endGame',function(stage) {
 // Q.load can be called at any time to load additional assets
 // assets that are already loaded will be skipped
 // The callback will be triggered when everything is loaded
-Q.load("birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
   // Sprites sheets can be created manually
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
@@ -187,6 +204,7 @@ Q.load("birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sp
   Q.sheet("player","jumphead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("enemy","dummyhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("birdhead","birdhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
+  Q.sheet("weapon","weapon.png", {"sx":0,"sy":0,"tilew":7,"tileh":21,"frames":1});
 
   // Finally, call stageScene to run the game
   Q.stageScene("level1");
