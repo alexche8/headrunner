@@ -86,14 +86,6 @@ Q.Sprite.extend("Enemy",{
       }
     });
 
-    // If the enemy gets hit on the top, destroy it
-    // and give the user a "hop"
-    //this.on("bump.top",function(collision) {
-    //  if(collision.obj.isA("Player")) { 
-    //    this.destroy();
-    //    collision.obj.p.vy = -300;
-    //  }
-    //});
   },
   update: function(dt) {
      this.trigger('prestep',dt);
@@ -102,8 +94,23 @@ Q.Sprite.extend("Enemy",{
      this.refreshMatrix();
      Q._invoke(this.children,"frame",dt);
      if(parseInt( this.p.x / 100) * 100 == 600){
-       //this.p.vx = 100; 
      }
+  }
+});
+
+Q.Sprite.extend("BirdHead", {
+  init: function(p){
+    this._super(p, { sheet: 'birdhead'});
+    this.position = 1800;
+  },
+  update: function(dt){
+    this.p.x +=  this.p.vx;
+    var int_position = parseInt(this.p.x / 100) * 100;
+    if(int_position == this.position + 200 ||
+       int_position == this.position - 200 ){
+       this.p.vx = -this.p.vx;
+    }
+
   }
 });
 
@@ -113,7 +120,7 @@ Q.Sprite.extend("Enemy",{
 Q.scene("level1",function(stage) {
 
   // Add in a repeater for a little parallax action
-  stage.insert(new Q.Repeater({ asset: "background-wall.png", speedX: 0.5, speedY: 0.5 }));
+  stage.insert(new Q.Repeater({ asset: "forest.png", speedX: 0.5, speedY: 0.5 }));
 
   // Add in a tile layer, and make it the collision layer
   stage.collisionLayer(new Q.TileLayer({
@@ -122,17 +129,20 @@ Q.scene("level1",function(stage) {
 
 
   // Create the player and add them to the stage
-  var player = stage.insert(new Q.Player({x:40,y:20}));
+  //var player = stage.insert(new Q.Player({x:260,y:20}));
+  var player = stage.insert(new Q.Player({x:1800,y:20}));
 
   // Give the stage a moveable viewport and tell it
   // to follow the player.
   stage.add("viewport").follow(player);
 
   // Add in a couple of enemies
-  stage.insert(new Q.Enemy({ x: 20, y: 0, vx: 110 }));
-  stage.insert(new Q.Enemy({ x: 1050, y: 180, vx: 0 }));
-  stage.insert(new Q.Enemy({ x: 1010, y: 180, vx: 13 }));
-  stage.insert(new Q.Enemy({ x: 800, y: 180, vx: 13 }));
+  stage.insert(new Q.Enemy({ x: 10, y: 0, vx: 203 }));
+  stage.insert(new Q.Enemy({ x: 70, y: 0, vx: 203 }));
+  stage.insert(new Q.Enemy({ x: 120, y: 0, vx: 203 }));
+  stage.insert(new Q.Enemy({ x: 1290, y: 203, vx: -204 }));
+  stage.insert(new Q.Enemy({ x: 1335, y: 203, vx: -204 }));
+  stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 2 }));
 
   // Finally add in the tower goal
 
@@ -168,13 +178,15 @@ Q.scene('endGame',function(stage) {
 // Q.load can be called at any time to load additional assets
 // assets that are already loaded will be skipped
 // The callback will be triggered when everything is loaded
-Q.load("jumphead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
   // Sprites sheets can be created manually
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
   // Or from a .json asset that defines sprite locations
   Q.compileSheets("sprites3.png","sprites.json");
   Q.sheet("player","jumphead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
+  Q.sheet("enemy","dummyhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
+  Q.sheet("birdhead","birdhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
 
   // Finally, call stageScene to run the game
   Q.stageScene("level1");
