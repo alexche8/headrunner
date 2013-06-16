@@ -93,9 +93,8 @@ Q.Sprite.extend("Enemy",{
      this.trigger('step',dt);
      this.refreshMatrix();
      Q._invoke(this.children,"frame",dt);
-     if(parseInt( this.p.x / 100) * 100 == 600){
-     }
-  }
+  },
+  
 });
 
 Q.Sprite.extend("Weapon", {
@@ -108,27 +107,58 @@ Q.Sprite.extend("Weapon", {
         collision.obj.destroy();
       }
     });
-
+    this.frame_number = this.frame_count();
   },
-  
+  frame_count: function(){
+     var count = 0;
+     return function(){
+        return count += 1;
+     }
+   },
+  update: function(dt) {
+     this.trigger('prestep',dt);
+     if(this.step) { this.step(dt); }
+     this.trigger('step',dt);
+     this.refreshMatrix();
+     Q._invoke(this.children,"frame",dt);
+     if(this.frame_number() % 30 == 0){
+       this.destroy();
+     }
+  },
+
+
 })
 
 Q.Sprite.extend("BirdHead", {
   init: function(p){
     this._super(p, { sheet: 'birdhead'});
     this.position = 1800;
+    this.frame_number = this.frame_count();
+  },
+  frame_count: function(){
+     var count = 0;
+     return function(){
+        return count += 1;
+     }
   },
   update: function(dt){
     this.p.x +=  this.p.vx;
     var int_position = parseInt(this.p.x / 100) * 100;
+    if(this.frame_number() % 50 == 0){
+       this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y}))
+    }
     if(int_position == this.position + 200 ||
        int_position == this.position - 200 ){
        this.p.vx = -this.p.vx;
-       this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y}))
     }
-
   }
 });
+
+Q.Sprite.extend("QuestionHead", {
+  init: function(p){
+    this._super(p, { sheet: 'questionhead'});
+  }
+}) 
 
 
 // ## Level1 scene
@@ -146,7 +176,7 @@ Q.scene("level1",function(stage) {
 
   // Create the player and add them to the stage
   var player = stage.insert(new Q.Player({x:260,y:20}));
-  //var player = stage.insert(new Q.Player({x:1800,y:20}));
+  //var player = stage.insert(new Q.Player({x:1735,y:20}));
 
   // Give the stage a moveable viewport and tell it
   // to follow the player.
@@ -158,8 +188,10 @@ Q.scene("level1",function(stage) {
   stage.insert(new Q.Enemy({ x: 120, y: 0, vx: 203 }));
   stage.insert(new Q.Enemy({ x: 1290, y: 203, vx: -204 }));
   stage.insert(new Q.Enemy({ x: 1335, y: 203, vx: -204 }));
+  stage.insert(new Q.Enemy({ x: 1829, y: 203, vx: 0 }));
   stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 2 }));
-  //stage.insert(new Q.Weapon({ x: 1770, y: 0, vx: 12 }));
+  stage.insert(new Q.QuestionHead({ x: 1935, y: 203, vx: 2 }));
+
 
   // Finally add in the tower goal
 
@@ -195,7 +227,7 @@ Q.scene('endGame',function(stage) {
 // Q.load can be called at any time to load additional assets
 // assets that are already loaded will be skipped
 // The callback will be triggered when everything is loaded
-Q.load("weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
   // Sprites sheets can be created manually
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
@@ -205,6 +237,7 @@ Q.load("weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummy
   Q.sheet("enemy","dummyhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("birdhead","birdhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("weapon","weapon.png", {"sx":0,"sy":0,"tilew":7,"tileh":21,"frames":1});
+  Q.sheet("questionhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
 
   // Finally, call stageScene to run the game
   Q.stageScene("level1");
