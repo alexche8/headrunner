@@ -1,4 +1,4 @@
 test-q-lib
 ==========
-o
+o;
 test-q-lib
