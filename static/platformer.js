@@ -18,6 +18,10 @@ var Q = window.Q = Quintus()
         .setup({ maximize: true })
         // And turn on default input controls and touch input (for UI)
         .controls().touch()
+Q.input.bindKey()
+Q.input.keyboardControls({
+  LEFT: "goLeft"
+});
 
 // ## Player Sprite
 // The very basic player sprite, this is just a normal sprite
@@ -53,7 +57,7 @@ Q.Sprite.extend("Player",{
         this.destroy();
       }
     });
-  },
+  }
   
 
 });
@@ -93,7 +97,7 @@ Q.Sprite.extend("Enemy",{
      this.trigger('step',dt);
      this.refreshMatrix();
      Q._invoke(this.children,"frame",dt);
-  },
+  }
   
 });
 
@@ -124,7 +128,7 @@ Q.Sprite.extend("Weapon", {
      if(this.frame_number() % 30 == 0){
        this.destroy();
      }
-  },
+  }
 
 
 })
@@ -173,8 +177,26 @@ Q.scene("level1",function(stage) {
                              dataAsset: 'level.json',
                              sheet:     'tiles' }));
 
+  stage.step = function(dt) {
+      if(this.paused) { return false; }
 
-  // Create the player and add them to the stage
+      this.trigger("prestep",dt);
+      this.updateSprites(this.items,dt);
+      this.trigger("step",dt);
+
+      if(this.removeList.length > 0) {
+        for(var i=0,len=this.removeList.length;i<len;i++) {
+          this.forceRemove(this.removeList[i]);
+        }
+        this.removeList.length = 0;
+      }
+      this.trigger('poststep',dt);
+      if(Q.inputs['down']){
+        console.log('her');
+      }
+  }
+
+  // Create the player and add them to the tage
   var player = stage.insert(new Q.Player({x:260,y:20}));
   //var player = stage.insert(new Q.Player({x:1735,y:20}));
 
@@ -191,10 +213,6 @@ Q.scene("level1",function(stage) {
   stage.insert(new Q.Enemy({ x: 1829, y: 203, vx: 0 }));
   stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 2 }));
   stage.insert(new Q.QuestionHead({ x: 1935, y: 203, vx: 2 }));
-
-
-  // Finally add in the tower goal
-
 
 
 });

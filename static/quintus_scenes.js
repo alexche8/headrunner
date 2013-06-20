@@ -545,8 +545,7 @@ Quintus.Scenes = function(Q) {
 
     updateSprites: function(items,dt,isContainer) {
       var item;
-
-      for(var i=0,len=items.length;i<len;i++) {              
+      for(var i=0,len=items.length;i<len;i++) {
         item = items[i];
         if(isContainer || !item.container) { 
           item.update(dt);
