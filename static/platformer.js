@@ -18,9 +18,9 @@ var Q = window.Q = Quintus()
         .setup({ maximize: true })
         // And turn on default input controls and touch input (for UI)
         .controls().touch()
-Q.input.bindKey()
+Q.input.bindKey(48, 0)
 Q.input.keyboardControls({
-  LEFT: "goLeft"
+  NULL: 0 
 });
 
 // ## Player Sprite
