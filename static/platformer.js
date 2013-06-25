@@ -18,10 +18,7 @@ var Q = window.Q = Quintus()
         .setup({ maximize: true })
         // And turn on default input controls and touch input (for UI)
         .controls().touch()
-Q.input.bindKey(48, 0)
-Q.input.keyboardControls({
-  NULL: 0 
-});
+
 
 // ## Player Sprite
 // The very basic player sprite, this is just a normal sprite
@@ -190,10 +187,7 @@ Q.scene("level1",function(stage) {
         }
         this.removeList.length = 0;
       }
-      this.trigger('poststep',dt);
-      if(Q.inputs['down']){
-        console.log('her');
-      }
+      this.trigger('poststep',dt);      
   }
 
   // Create the player and add them to the tage
@@ -222,6 +216,64 @@ Q.scene("level1",function(stage) {
 // to control the displayed message.
 Q.scene('endGame',function(stage) {
   var container = stage.insert(new Q.UI.Container({
+    x: Q.width/2 - 150, y: Q.height/2, fill: "rgba(0,0,0,0.5)", 
+  }));  
+
+  var button = container.insert(new Q.UI.Button({ x: -18, y: 0, fill: "#CCCCCC",
+                                                  label: "Confirm" }));
+  var clear = container.insert(new Q.UI.Button({ x: -30, y: 50, fill: "#CCCCCC",
+                                                  label: "Clear" }))
+              .on("click", function(){
+  					answer.p.label = "";            	
+              });
+  var answer = container.insert(new Q.UI.Text({x:200, y: 0, 
+                                                 label: 'Enter Answer Quickly!',
+                                                 fill: "#FFFFFF" }));                                                                                                                                                      
+  var x = -50, y = 100;                  
+  for(var key in [1,2,3,4,5,6,7,8,9,0]){  	
+	  container.insert(new Q.UI.Button({ x: x, y: y, fill: "#CCCCCC",
+	                                                  label: key }))
+	  .on("click", function(){
+	  		if(!parseInt(answer.p.label)){
+	  			answer.p.label = ""
+	  		}
+	 		answer.p.label = answer.p.label + this.p.label; 
+	  });
+	  x += 50;                                                                                                
+  }                                                         
+                                                     
+  // When the button is clicked, clear all the stages
+  // and restart the game.
+  button.on("click",function() {
+    Q.clearStages();
+    Q.stageScene('level1');
+  });
+  
+  stage.step = function(dt) {
+      if(this.paused) { return false; }
+
+      this.trigger("prestep",dt);
+      this.updateSprites(this.items,dt);
+      this.trigger("step",dt);
+
+      if(this.removeList.length > 0) {
+        for(var i=0,len=this.removeList.length;i<len;i++) {
+          this.forceRemove(this.removeList[i]);
+        }
+        this.removeList.length = 0;
+      }
+      this.trigger('poststep',dt);
+            
+            
+  }
+
+  // Expand the container to visibily fit it's contents
+  // (with a padding of 20 pixels)
+  container.fit(20);
+});
+
+Q.scene('getAnswer',function(stage) {
+  var container = stage.insert(new Q.UI.Container({
     x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
   }));
 
@@ -229,6 +281,8 @@ Q.scene('endGame',function(stage) {
                                                   label: "Play Again" }))         
   var label = container.insert(new Q.UI.Text({x:10, y: -10 - button.p.h, 
                                                    label: stage.options.label }));
+  var input = container.insert(new Q.UI.Text({x:10, y: -10 - label.p.h, 
+                                                   label: stage.options.label }));                                                   
   // When the button is clicked, clear all the stages
   // and restart the game.
   button.on("click",function() {

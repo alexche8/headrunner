@@ -205,6 +205,7 @@ Quintus.UI = function(Q) {
     },
 
     draw: function(ctx) {
+		
        //this.prerender();
       if(this.p.opacity === 0) { return; }
 
