@@ -32,7 +32,8 @@ Q.Sprite.extend("Player",{
     this._super(p, {
       sheet: "player",  // Setting a sprite sheet sets sprite width and height
       x: 410,           // You can also set additional properties that can
-      y: 90             // be overridden on object creation
+      y: 90,             // be overridden on object creation
+      items: []
     });
 
     // Add in pre-made components to get up and running quickly
@@ -158,8 +159,30 @@ Q.Sprite.extend("BirdHead", {
 Q.Sprite.extend("QuestionHead", {
   init: function(p){
     this._super(p, { sheet: 'questionhead'});
+    this.add('2d');
+    this.on("bump.left",function(collision) {
+      if(collision.obj.isA("Player")) { 
+        Q.stageScene("getAnswer",1); 
+        collision.obj.del("platformerControls");        
+      }      
+    });
+   
   }
 }) 
+
+Q.Sprite.extend("MonkeyHead", {
+  init: function(p){
+    this._super(p, { sheet: 'monkeyhead'});
+    this.add('2d');
+    this.on("bump.left",function(collision) {
+      if(collision.obj.isA("Player")) { 
+        Q.stageScene("simplePopup",1); 
+        collision.obj.del("platformerControls");        
+      }      
+    });
+   
+  }
+})
 
 
 // ## Level1 scene
@@ -191,8 +214,8 @@ Q.scene("level1",function(stage) {
   }
 
   // Create the player and add them to the tage
-  var player = stage.insert(new Q.Player({x:260,y:20}));
-  //var player = stage.insert(new Q.Player({x:1735,y:20}));
+  //var player = stage.insert(new Q.Player({x:260,y:20}));
+  var player = stage.insert(new Q.Player({x:2325,y:20}));
 
   // Give the stage a moveable viewport and tell it
   // to follow the player.
@@ -206,15 +229,19 @@ Q.scene("level1",function(stage) {
   stage.insert(new Q.Enemy({ x: 1335, y: 203, vx: -204 }));
   stage.insert(new Q.Enemy({ x: 1829, y: 203, vx: 0 }));
   stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 2 }));
-  stage.insert(new Q.QuestionHead({ x: 1935, y: 203, vx: 2 }));
+  stage.insert(new Q.QuestionHead({ x: 2425, y: 303 }));
+  stage.insert(new Q.MonkeyHead({ x: 2450, y: 227 }));
 
 
 });
 
+
 // To display a game over / game won popup box, 
 // create a endGame scene that takes in a `label` option
 // to control the displayed message.
-Q.scene('endGame',function(stage) {
+Q.scene('getAnswer',function(stage) {
+// 	  
+  	
   var container = stage.insert(new Q.UI.Container({
     x: Q.width/2 - 150, y: Q.height/2, fill: "rgba(0,0,0,0.5)", 
   }));  
@@ -229,6 +256,12 @@ Q.scene('endGame',function(stage) {
   var answer = container.insert(new Q.UI.Text({x:200, y: 0, 
                                                  label: 'Enter Answer Quickly!',
                                                  fill: "#FFFFFF" }));                                                                                                                                                      
+  var timer_label = container.insert(new Q.UI.Text({x:200, y: 50, 
+                                                 label: 'Timer',
+                                                 fill: "#FFFFFF" }));                                                 
+  var expression = container.insert(new Q.UI.Text({x:100, y: 50,                                                  
+                                                 fill: "#FFFFFF" }));
+                    
   var x = -50, y = 100;                  
   for(var key in [1,2,3,4,5,6,7,8,9,0]){  	
 	  container.insert(new Q.UI.Button({ x: x, y: y, fill: "#CCCCCC",
@@ -240,14 +273,38 @@ Q.scene('endGame',function(stage) {
 	 		answer.p.label = answer.p.label + this.p.label; 
 	  });
 	  x += 50;                                                                                                
-  }                                                         
+  }    
+  
+  var random_a = Math.floor((Math.random()*100)+1);                                                     
+  var random_b = Math.floor((Math.random()*100)+1);
+  expression.p.label = random_a.toString() + ' + ' + random_b.toString();
+  random_result = random_a + random_b;
+    
                                                      
-  // When the button is clicked, clear all the stages
-  // and restart the game.
-  button.on("click",function() {
-    Q.clearStages();
-    Q.stageScene('level1');
+  //Check answer
+  button.on("click",function() {  	 
+     if(parseInt(answer.p.label) == random_result){     	          	     	
+     	Q.stages[0].lists.QuestionHead[0].off("bump.left");
+     	delete Q.stages[1];	
+     	Q.stages[0].lists.Player[0].add('platformerControls');
+     	Q._extend(Q.stages[0].lists.Player[0].p.items, {"name": "banana"});     	
+  	 }
+  	 else{      	
+      	Q.stageScene("endGame",1, { label: "You Died" }); 
+        Q.stages[0].lists.Player[0].destroy();
+     }
+     console.log(Q.stages[0].lists.Player[0].p.items);
   });
+  
+  var timer = 1000;
+  
+  function countdown(){
+  	if (timer == 0){
+  		 Q.stageScene("endGame",1, { label: "You Died" }); 
+  	}
+  	timer -= 1;
+  	return timer.toString();  	
+  }
   
   stage.step = function(dt) {
       if(this.paused) { return false; }
@@ -262,17 +319,18 @@ Q.scene('endGame',function(stage) {
         }
         this.removeList.length = 0;
       }
-      this.trigger('poststep',dt);
-            
+      this.trigger('poststep',dt);      
+      timer_label.p.label = countdown();
             
   }
 
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
   container.fit(20);
+  stage.container = container;  
 });
 
-Q.scene('getAnswer',function(stage) {
+Q.scene('endGame',function(stage) {
   var container = stage.insert(new Q.UI.Container({
     x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
   }));
@@ -280,9 +338,7 @@ Q.scene('getAnswer',function(stage) {
   var button = container.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
                                                   label: "Play Again" }))         
   var label = container.insert(new Q.UI.Text({x:10, y: -10 - button.p.h, 
-                                                   label: stage.options.label }));
-  var input = container.insert(new Q.UI.Text({x:10, y: -10 - label.p.h, 
-                                                   label: stage.options.label }));                                                   
+                                                   label: stage.options.label }));                                                     
   // When the button is clicked, clear all the stages
   // and restart the game.
   button.on("click",function() {
@@ -292,6 +348,37 @@ Q.scene('getAnswer',function(stage) {
 
   // Expand the container to visibily fit it's contents
   // (with a padding of 20 pixels)
+  container.fit(20);
+});
+
+Q.scene('simplePopup',function(stage) {
+  var container = stage.insert(new Q.UI.Container({
+    x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+  }));  
+  var text;
+  var permit = "name" in Q.stages[0].lists.Player[0].p.items && 
+      Q.stages[0].lists.Player[0].p.items["name"] == "banana"                                                                                                              
+  if(permit){       
+  	text = "Banana!!! Come in Please"
+  }
+  else{
+  	text = "Arggh!!! Go Away!"
+  }
+  
+  
+  
+  
+  var label = container.insert(new Q.UI.Text({x:10, y: -60, label: text }));  
+  var button = container.insert(new Q.UI.Button({ x: 0, y: -10, fill: "#CCCCCC",
+                                                  label: "Ok" }))
+  button.on("click", function(){
+  	 container.destroy();
+  	 Q.stages[0].lists.Player[0].add('platformerControls');
+  	 if(permit){
+  	 	Q.stages[0].lists.MonkeyHead[0].destroy();
+  	 }
+  })                                               
+  
   container.fit(20);
 });
 
@@ -310,6 +397,7 @@ Q.load("questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, j
   Q.sheet("birdhead","birdhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("weapon","weapon.png", {"sx":0,"sy":0,"tilew":7,"tileh":21,"frames":1});
   Q.sheet("questionhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
+  Q.sheet("monkeyhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
 
   // Finally, call stageScene to run the game
   Q.stageScene("level1");
