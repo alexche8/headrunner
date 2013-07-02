@@ -1,28 +1,10 @@
-// # Quintus platformer example
-//
-// [Run the example](../examples/platformer/index.html)
-// WARNING: this game must be run from a non-file:// url
-// as it loads a level json file.
-//
-// This is the example from the website homepage, it consists
-// a simple, non-animated platformer with some enemies and a 
-// target for the player.
 window.addEventListener("load",function() {
-// hello
-// Set up an instance of the Quintus engine  and include
-// the Sprites, Scenes, Input and 2D module. The 2D module
-// includes the `TileLayer` class as well as the `2d` componet.
+
 var Q = window.Q = Quintus()
         .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
-        // Maximize this game to whatever the size of the browser is
-        .setup({ maximize: true })
-        // And turn on default input controls and touch input (for UI)
+        .setup({ maximize: true })        
         .controls().touch()
 
-
-// ## Player Sprite
-// The very basic player sprite, this is just a normal sprite
-// using the player sprite sheet with default controls added to it.
 Q.Sprite.extend("Player",{
 
   // the init constructor is called on creation
@@ -33,7 +15,12 @@ Q.Sprite.extend("Player",{
       sheet: "player",  // Setting a sprite sheet sets sprite width and height
       x: 410,           // You can also set additional properties that can
       y: 90,             // be overridden on object creation
-      items: []
+      items: [],
+      true_items: {
+      	crystal: {
+      		'count': 0
+      	}      	
+      }
     });
 
     // Add in pre-made components to get up and running quickly
@@ -101,7 +88,7 @@ Q.Sprite.extend("Enemy",{
 
 Q.Sprite.extend("Weapon", {
   init: function(p){
-    this._super(p, {sheet: 'weapon'});
+    this._super(p, {sheet: 'weapon'});    
     this.add("2d");
     this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
        if(collision.obj.isA("Player")) { 
@@ -123,19 +110,34 @@ Q.Sprite.extend("Weapon", {
      this.trigger('step',dt);
      this.refreshMatrix();
      Q._invoke(this.children,"frame",dt);
-     if(this.frame_number() % 30 == 0){
+     if(this.frame_number() % 50 == 0){
        this.destroy();
      }
   }
 
+});
 
+Q.Sprite.extend("Crystal", {
+   init: function(p){
+      this._super(p, {sheet: 'weapon'});
+   	  this.add("2d");
+   	  var $this = this;
+   	  this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
+        if(collision.obj.isA("Player")) {
+        	console.log(collision.obj.p)
+        	collision.obj.p.true_items.crystal.count += 1;        	 	        
+	        $this.destroy();
+        }
+    });
+   }
 })
 
 Q.Sprite.extend("BirdHead", {
   init: function(p){
-    this._super(p, { sheet: 'birdhead'});
-    this.position = 1800;
+    this._super(p, { sheet: 'birdhead', gravity: 0});    
+    this.add("2d, aiBounce");    
     this.frame_number = this.frame_count();
+    this.position = parseInt(p.x / 100) * 100;    
   },
   frame_count: function(){
      var count = 0;
@@ -143,26 +145,33 @@ Q.Sprite.extend("BirdHead", {
         return count += 1;
      }
   },
-  update: function(dt){
-    this.p.x +=  this.p.vx;
-    var int_position = parseInt(this.p.x / 100) * 100;
-    if(this.frame_number() % 50 == 0){
-       this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y}))
-    }
-    if(int_position == this.position + 200 ||
-       int_position == this.position - 200 ){
-       this.p.vx = -this.p.vx;
-    }
-  }
+  update: function(dt) {
+     this.trigger('prestep',dt);
+     if(this.step) { this.step(dt); }
+     this.trigger('step',dt);
+     this.refreshMatrix();
+     Q._invoke(this.children,"frame",dt);    
+      
+     if(this.frame_number() % 50 == 0){          	
+     	
+        this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y + 25}))     
+     }
+     
+     var int_position = parseInt(this.p.x / 100) * 100;
+     if(int_position == this.position - this.p.left_position || 
+     	int_position == this.position + this.p.right_position){
+	    this.p.vx = -this.p.vx;     	
+     }           
+  }  
 });
 
 Q.Sprite.extend("QuestionHead", {
   init: function(p){
     this._super(p, { sheet: 'questionhead'});
     this.add('2d');
-    this.on("bump.left",function(collision) {
+    this.on("bump.left, bump.right, bump.top",function(collision) {
       if(collision.obj.isA("Player")) { 
-        Q.stageScene("getAnswer",1); 
+        Q.stageScene(p.dialog,1); 
         collision.obj.del("platformerControls");        
       }      
     });
@@ -213,24 +222,42 @@ Q.scene("level1",function(stage) {
       this.trigger('poststep',dt);      
   }
 
-  // Create the player and add them to the tage
-  //var player = stage.insert(new Q.Player({x:260,y:20}));
-  var player = stage.insert(new Q.Player({x:2325,y:20}));
 
-  // Give the stage a moveable viewport and tell it
-  // to follow the player.
+  var player = stage.insert(new Q.Player({x:4260,y:20}));
+  //var player = stage.insert(new Q.Player({x:300,y:100}));
+  
   stage.add("viewport").follow(player);
-
-  // Add in a couple of enemies
+  
   stage.insert(new Q.Enemy({ x: 10, y: 0, vx: 203 }));
   stage.insert(new Q.Enemy({ x: 70, y: 0, vx: 203 }));
   stage.insert(new Q.Enemy({ x: 120, y: 0, vx: 203 }));
   stage.insert(new Q.Enemy({ x: 1290, y: 203, vx: -204 }));
   stage.insert(new Q.Enemy({ x: 1335, y: 203, vx: -204 }));
   stage.insert(new Q.Enemy({ x: 1829, y: 203, vx: 0 }));
-  stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 2 }));
-  stage.insert(new Q.QuestionHead({ x: 2425, y: 303 }));
+  stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 200,left_position: 100, right_position: 500 }));
+  stage.insert(new Q.QuestionHead({ x: 2425, y: 303, dialog: 'getAnswer', 
+  collisionCallback: function(){
+		
+  }}));
   stage.insert(new Q.MonkeyHead({ x: 2450, y: 227 }));
+  
+  stage.insert(new Q.Enemy({ x: 2780, y: 200, vx: 40 }));  
+  stage.insert(new Q.Enemy({ x: 3140, y: 200, vx: -30 }));
+  stage.insert(new Q.Enemy({ x: 3090, y: 200, vx: -20 }));
+  stage.insert(new Q.Enemy({ x: 3240, y: 200, vx: -50 }));
+  stage.insert(new Q.Enemy({ x: 3280, y: 200, vx: -20 }));
+  
+  
+  stage.insert(new Q.QuestionHead({ x: 3625, y: 203, dialog: 'giveKey' }));
+    
+  
+  
+  stage.insert(new Q.BirdHead({ x: 4235, y: 3, vx: 200,left_position: 100, right_position: 500 }));  
+  stage.insert(new Q.BirdHead({ x: 4035, y: 3, vx: 140,left_position: 100, right_position: 500 }));
+  
+  stage.insert(new Q.Crystal({ x: 2480, y: 50}));
+  stage.insert(new Q.Crystal({ x: 3410, y: 300}));
+  stage.insert(new Q.Crystal({ x: 4600, y: 200}));
 
 
 });
@@ -351,6 +378,27 @@ Q.scene('endGame',function(stage) {
   container.fit(20);
 });
 
+Q.scene('giveKey',function(stage) {
+  var container = stage.insert(new Q.UI.Container({
+    x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+  }));
+
+  var button = container.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
+                                                  label: "Ok" }))         
+  var label = container.insert(new Q.UI.Text({x:10, y: -10 - button.p.h, 
+                                                   label: 'Give Me 3 crystals and I give you key to doors' }));                                                     
+  // When the button is clicked, clear all the stages
+  // and restart the game.
+  button.on("click",function() {
+    container.destroy();    
+    Q.stages[0].lists.Player[0].add('platformerControls');
+  });
+
+  // Expand the container to visibily fit it's contents
+  // (with a padding of 20 pixels)
+  container.fit(20);
+});
+
 Q.scene('simplePopup',function(stage) {
   var container = stage.insert(new Q.UI.Container({
     x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
@@ -364,10 +412,7 @@ Q.scene('simplePopup',function(stage) {
   else{
   	text = "Arggh!!! Go Away!"
   }
-  
-  
-  
-  
+        
   var label = container.insert(new Q.UI.Text({x:10, y: -60, label: text }));  
   var button = container.insert(new Q.UI.Button({ x: 0, y: -10, fill: "#CCCCCC",
                                                   label: "Ok" }))
@@ -381,6 +426,12 @@ Q.scene('simplePopup',function(stage) {
   
   container.fit(20);
 });
+
+Q.scene('simplePopup',function(stage) {
+  var container = stage.insert(new Q.UI.Container({
+    x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+  }));
+});	  
 
 // ## Asset Loading and Game Launch
 // Q.load can be called at any time to load additional assets
@@ -403,15 +454,5 @@ Q.load("questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, j
   Q.stageScene("level1");
 });
 
-// ## Possible Experimentations:
-// 
-// The are lots of things to try out here.
-// 
-// 1. Modify level.json to change the level around and add in some more enemies.
-// 2. Add in a second level by creating a level2.json and a level2 scene that gets
-//    loaded after level 1 is complete.
-// 3. Add in a title screen
-// 4. Add in a hud and points for jumping on enemies.
-// 5. Add in a `Repeater` behind the TileLayer to create a paralax scrolling effect.
 
 });
