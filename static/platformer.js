@@ -1,16 +1,14 @@
 window.addEventListener("load",function() {
 
 var Q = window.Q = Quintus()
-        .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+        .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Enemies, Utils")
         .setup({ maximize: true })        
         .controls().touch()
 
 Q.Sprite.extend("Player",{
 
-  // the init constructor is called on creation
   init: function(p) {
 
-    // You can call the parent's constructor with this._super(..)
     this._super(p, {
       sheet: "player",  // Setting a sprite sheet sets sprite width and height
       x: 410,           // You can also set additional properties that can
@@ -23,20 +21,10 @@ Q.Sprite.extend("Player",{
       }
     });
 
-    // Add in pre-made components to get up and running quickly
-    // The `2d` component adds in default 2d collision detection
-    // and kinetics (velocity, gravity)
-    // The `platformerControls` makes the player controllable by the
-    // default input actions (left, right to move,  up or action to jump)
-    // It also checks to make sure the player is on a horizontal surface before
-    // letting them jump.
     this.add('2d, platformerControls');
 
-    // Write event handlers to respond hook into behaviors.
-    // hit.sprite is called everytime the player collides with a sprite
     this.on("hit.sprite",function(collision) {
 
-      // Check the collision, if it's the Tower, you win!
       if(collision.obj.isA("Tower")) {
         Q.stageScene("endGame",1, { label: "You Won!" }); 
         this.destroy();
@@ -44,55 +32,15 @@ Q.Sprite.extend("Player",{
     });
   }
   
-
-});
-
-
-// ## Tower Sprite
-// Sprites can be simple, the Tower sprite just sets a custom sprite sheet
-Q.Sprite.extend("Tower", {
-  init: function(p) {
-    this._super(p, { sheet: 'tower' });
-  }
-});
-
-// ## Enemy Sprite
-// Create the Enemy class to add in some baddies
-Q.Sprite.extend("Enemy",{
-  init: function(p) {
-    this._super(p, { sheet: 'enemy', vx: -100 });
-
-    // Enemies use the Bounce AI to change direction 
-    // whenver they run into something.
-    this.add('2d, aiBounce');
-
-    // Listen for a sprite collision, if it's the player,
-    // end the game unless the enemy is hit on top
-    this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
-      if(collision.obj.isA("Player")) { 
-        Q.stageScene("endGame",1, { label: "You Died" }); 
-        collision.obj.destroy();
-      }
-    });
-
-  },
-  update: function(dt) {
-     this.trigger('prestep',dt);
-     if(this.step) { this.step(dt); }
-     this.trigger('step',dt);
-     this.refreshMatrix();
-     Q._invoke(this.children,"frame",dt);
-  }
-  
 });
 
 Q.Sprite.extend("Weapon", {
   init: function(p){
-    this._super(p, {sheet: 'weapon'});    
+    this._super(p, {sheet: 'weapon'});
     this.add("2d");
     this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
-       if(collision.obj.isA("Player")) { 
-        Q.stageScene("endGame",1, { label: "You Died" }); 
+       if(collision.obj.isA("Player")) {
+        Q.stageScene("endGame",1, { label: "You Died" });
         collision.obj.destroy();
       }
     });
@@ -125,57 +73,26 @@ Q.Sprite.extend("Crystal", {
    	  this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
         if(collision.obj.isA("Player")) {
         	console.log(collision.obj.p)
-        	collision.obj.p.true_items.crystal.count += 1;        	 	        
+        	collision.obj.p.true_items.crystal.count += 1;
 	        $this.destroy();
         }
     });
    }
 })
 
-Q.Sprite.extend("BirdHead", {
-  init: function(p){
-    this._super(p, { sheet: 'birdhead', gravity: 0});    
-    this.add("2d, aiBounce");    
-    this.frame_number = this.frame_count();
-    this.position = parseInt(p.x / 100) * 100;    
-  },
-  frame_count: function(){
-     var count = 0;
-     return function(){
-        return count += 1;
-     }
-  },
-  update: function(dt) {
-     this.trigger('prestep',dt);
-     if(this.step) { this.step(dt); }
-     this.trigger('step',dt);
-     this.refreshMatrix();
-     Q._invoke(this.children,"frame",dt);    
-      
-     if(this.frame_number() % 50 == 0){          	
-     	
-        this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y + 25}))     
-     }
-     
-     var int_position = parseInt(this.p.x / 100) * 100;
-     if(int_position == this.position - this.p.left_position || 
-     	int_position == this.position + this.p.right_position){
-	    this.p.vx = -this.p.vx;     	
-     }           
-  }  
-});
+
 
 Q.Sprite.extend("QuestionHead", {
   init: function(p){
     this._super(p, { sheet: 'questionhead'});
     this.add('2d');
     this.on("bump.left, bump.right, bump.top",function(collision) {
-      if(collision.obj.isA("Player")) { 
-        Q.stageScene(p.dialog,1); 
-        collision.obj.del("platformerControls");        
-      }      
+      if(collision.obj.isA("Player")) {
+        Q.stageScene(p.dialog,1);
+        collision.obj.del("platformerControls");
+      }
     });
-   
+
   }
 }) 
 
@@ -223,17 +140,17 @@ Q.scene("level1",function(stage) {
   }
 
 
-  var player = stage.insert(new Q.Player({x:4260,y:20}));
-  //var player = stage.insert(new Q.Player({x:300,y:100}));
+  //var player = stage.insert(new Q.Player({x:4260,y:20}));
+  var player = stage.insert(new Q.Player({x:300,y:100}));
   
   stage.add("viewport").follow(player);
   
-  stage.insert(new Q.Enemy({ x: 10, y: 0, vx: 203 }));
-  stage.insert(new Q.Enemy({ x: 70, y: 0, vx: 203 }));
-  stage.insert(new Q.Enemy({ x: 120, y: 0, vx: 203 }));
-  stage.insert(new Q.Enemy({ x: 1290, y: 203, vx: -204 }));
-  stage.insert(new Q.Enemy({ x: 1335, y: 203, vx: -204 }));
-  stage.insert(new Q.Enemy({ x: 1829, y: 203, vx: 0 }));
+  stage.insert(new Q.DummyHead({ x: 10, y: 0, vx: 203 }));
+  stage.insert(new Q.DummyHead({ x: 70, y: 0, vx: 203 }));
+  stage.insert(new Q.DummyHead({ x: 120, y: 0, vx: 203 }));
+  stage.insert(new Q.DummyHead({ x: 1290, y: 203, vx: -204 }));
+  stage.insert(new Q.DummyHead({ x: 1335, y: 203, vx: -204 }));
+  stage.insert(new Q.DummyHead({ x: 1829, y: 203, vx: 0 }));
   stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 200,left_position: 100, right_position: 500 }));
   stage.insert(new Q.QuestionHead({ x: 2425, y: 303, dialog: 'getAnswer', 
   collisionCallback: function(){
@@ -241,11 +158,11 @@ Q.scene("level1",function(stage) {
   }}));
   stage.insert(new Q.MonkeyHead({ x: 2450, y: 227 }));
   
-  stage.insert(new Q.Enemy({ x: 2780, y: 200, vx: 40 }));  
-  stage.insert(new Q.Enemy({ x: 3140, y: 200, vx: -30 }));
-  stage.insert(new Q.Enemy({ x: 3090, y: 200, vx: -20 }));
-  stage.insert(new Q.Enemy({ x: 3240, y: 200, vx: -50 }));
-  stage.insert(new Q.Enemy({ x: 3280, y: 200, vx: -20 }));
+  stage.insert(new Q.DummyHead({ x: 2780, y: 200, vx: 40 }));
+  stage.insert(new Q.DummyHead({ x: 3140, y: 200, vx: -30 }));
+  stage.insert(new Q.DummyHead({ x: 3090, y: 200, vx: -20 }));
+  stage.insert(new Q.DummyHead({ x: 3240, y: 200, vx: -50 }));
+  stage.insert(new Q.DummyHead({ x: 3280, y: 200, vx: -20 }));
   
   
   stage.insert(new Q.QuestionHead({ x: 3625, y: 203, dialog: 'giveKey' }));
