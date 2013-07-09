@@ -31,9 +31,8 @@ Quintus.UI = function(Q) {
     init: function(p,defaults) {
       var adjustedP = Q._clone(p||{}),
           match;
-
       if(p && Q._isString(p.w) && (match = p.w.match(/^[0-9]+%$/))) {
-        adjustedP.w = parseInt(p.w,10) * Q.width / 100;         
+        adjustedP.w = parseInt(p.w,10) * Q.width / 100;
         adjustedP.x = Q.width/2 - adjustedP.w/2;
       }
 
