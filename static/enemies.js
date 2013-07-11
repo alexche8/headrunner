@@ -18,7 +18,18 @@ Quintus["Enemies"] = function(Q) {
          return function(){
             return count += 1;
          }
+      },
+      update: function(dt) {
+        if(parseInt(this.p.y / 100) * 100 == parseInt(Q.height % 10) * 100 + 300){
+            this.destroy();
+        }
+        this.trigger('prestep',dt);
+        if(this.step) { this.step(dt); }
+        this.trigger('step',dt);
+        this.refreshMatrix();
+        Q._invoke(this.children,"frame",dt);
       }
+
 
   });
 
@@ -27,6 +38,13 @@ Quintus["Enemies"] = function(Q) {
         this._super(Q._extend(p,{ sheet: 'enemy'}));
       }
   });
+
+  Q.DummyHead.extend("GuardHead",{
+      init: function(p) {
+        this._super(p);
+      }
+  });
+
 
 
   Q.Enemy.extend("BirdHead", {

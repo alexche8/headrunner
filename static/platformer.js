@@ -21,17 +21,34 @@ Q.Sprite.extend("Player",{
       	}      	
       }
     });
-
     this.add('2d, platformerControls');
-    this.on("hit.sprite",function(collision) {
-
-      if(collision.obj.isA("Tower")) {
-        Q.stageScene("endGame",1, { label: "You Won!" }); 
-        this.destroy();
+  },
+  update: function(dt) {
+    if(parseInt(this.p.y / 100) * 100 == parseInt(Q.height % 10) * 100 + 300){
+        Q.stageScene("endGame",1)
+    }
+    this.trigger('prestep',dt);
+    if(this.step) { this.step(dt); }
+    this.trigger('step',dt);
+    this.refreshMatrix();
+    Q._invoke(this.children,"frame",dt);
+  },
+  remove_item: function(item_name){
+      if(this.p.true_items[item_name].count != 0){
+          this.p.true_items[items_name].count -= 1;
+          Q.stage(2).lists['UI.Text'][1].p.label = 'x ' + this.p.true_items.crystal.count;
       }
-    });
+  },
+  remove_all_item: function(item_name){
+      this.p.true_items[item_name].count = 0;
+      Q.stage(2).lists['UI.Text'][1].p.label = 'x ' + 0;
+  },
+  add_item: function(item_name){
+      this.p.true_items[item_name].count += 1;
+      Q.stage(2).lists['UI.Text'][1].p.label = 'x ' + this.p.true_items.crystal.count;
   }
-  
+
+
 });
 
 
@@ -46,7 +63,6 @@ Q.Sprite.extend("Title", {
 });
 
 Q.scene("level1",function(stage) {
-
 
   stage.insert(new Q.Repeater({ asset: "forest.png", speedX: 0.5, speedY: 0.5 }));
   stage.collisionLayer(new Q.TileLayer({
@@ -70,9 +86,10 @@ Q.scene("level1",function(stage) {
   }
 
 
-  var player = stage.insert(new Q.Player({x:3860,y:20}));
-  //var player = stage.insert(new Q.Player({x:300,y:100}));
-  
+  //var player = stage.insert(new Q.Player({x:3860,y:20}));
+  var player = stage.insert(new Q.Player({x:300,y:100}));
+  //var player = stage.insert(new Q.Player({x:2324,y:303}));
+
   stage.add("viewport").follow(player);
   
   stage.insert(new Q.DummyHead({ x: 10, y: 0, vx: 203 }));
@@ -80,31 +97,36 @@ Q.scene("level1",function(stage) {
   stage.insert(new Q.DummyHead({ x: 120, y: 0, vx: 203 }));
   stage.insert(new Q.DummyHead({ x: 1290, y: 203, vx: -204 }));
   stage.insert(new Q.DummyHead({ x: 1335, y: 203, vx: -204 }));
-  stage.insert(new Q.DummyHead({ x: 1829, y: 203, vx: 0 }));
+  stage.insert(new Q.DummyHead({ x: 1829, y: 203, vx: 0, name: 'guard'}));
   stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 200,left_position: 100, right_position: 500 }));
-  stage.insert(new Q.QuestionHead({ x: 2425, y: 303, dialog: 'getAnswer', 
+  stage.insert(new Q.QuestionHead({ x: 2425, y: 303, dialog: 'getAnswer',
   collisionCallback: function(){
-		
+
   }}));
-  stage.insert(new Q.MonkeyHead({ x: 2450, y: 227 }));
-  
+  stage.insert(new Q.GuardHead({ x: 2450, y: 227 }));
+
   stage.insert(new Q.DummyHead({ x: 2780, y: 200, vx: 40 }));
   stage.insert(new Q.DummyHead({ x: 3140, y: 200, vx: -30 }));
   stage.insert(new Q.DummyHead({ x: 3090, y: 200, vx: -20 }));
   stage.insert(new Q.DummyHead({ x: 3240, y: 200, vx: -50 }));
-  stage.insert(new Q.DummyHead({ x: 3280, y: 200, vx: -20 }));
+
   
-  
-  stage.insert(new Q.QuestionHead({ x: 3625, y: 203, dialog: 'giveKey' }));
+  stage.insert(new Q.QuestionHead({ x: 3625, y: 203, dialog: 'giveKey', collision_callback: function(player){
+    if(player.p.true_items.crystal.count == 3){
+        this.destroy();
+        Q.stageScene("simplePopup1",1);
+        Q.stage().insert(new Q.Door({x:4600,y:70}));
+    }
+  } }));
     
   
   
   stage.insert(new Q.BirdHead({ x: 4235, y: 3, vx: 200,left_position: 100, right_position: 500 }));  
-  stage.insert(new Q.BirdHead({ x: 4035, y: 3, vx: 140,left_position: 100, right_position: 500 }));
+ // stage.insert(new Q.BirdHead({ x: 4035, y: 3, vx: 140,left_position: 100, right_position: 500 }));
   
   stage.insert(new Q.Crystal({ x: 2480, y: 50}));
   stage.insert(new Q.Crystal({ x: 3410, y: 300}));
-  stage.insert(new Q.Crystal({ x: 4600, y: 200}));
+  stage.insert(new Q.Crystal({ x: 4600, y: 250}));
 
     var container = stage.insert(new Q.UI.Container({
       fill: "gray",
@@ -127,7 +149,7 @@ Q.scene("level1",function(stage) {
     Q.stageScene("userPanel",2);
 });
 
-Q.load("crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
 
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
@@ -139,7 +161,7 @@ Q.load("crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jum
   Q.sheet("questionhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("monkeyhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("crystal","crystal.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
-
+  Q.sheet("door","door1.png", {"sx":0,"sy":0,"tilew":30,"tileh":58,"frames":1});
   Q.stageScene("level1");
 });
 

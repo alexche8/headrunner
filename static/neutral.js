@@ -14,12 +14,15 @@ Quintus["Neutral"] = function(Q) {
           if(collision.obj.isA("Player")) {
             Q.stageScene(p.dialog,1);
             collision.obj.del("platformerControls");
+            if('collision_callback' in this.p){
+                this.p.collision_callback.apply(this, [collision.obj]);
+            }
           }
         });
       }
-    })
+    });
 
-    Q.Sprite.extend("MonkeyHead", {
+    Q.Neutral.extend("MonkeyHead", {
       init: function(p){
         this._super(p, { sheet: 'monkeyhead'});
         this.on("bump.left",function(collision) {
@@ -29,6 +32,7 @@ Quintus["Neutral"] = function(Q) {
           }
         });
       }
-    })
+    });
+
 
 }

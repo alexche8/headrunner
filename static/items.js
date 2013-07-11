@@ -38,13 +38,23 @@ Q.Sprite.extend("Crystal", {
    	  var $this = this;
    	  this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
         if(collision.obj.isA("Player")) {
-        	collision.obj.p.true_items.crystal.count += 1;
-            var panel = Q.stage(2);
-            var dist = 'UI.Crystal' in panel.lists ? panel.lists['UI.Crystal'].length * 10 : 10;
-            //var dist = panel.lists.indexOf('UI.Crystal') > -1;
-            Q.stage(2).lists['UI.Container'][0].insert(new Q.UI.Crystal({ x: 10, y: -dist }))
-
+            collision.obj.add_item("crystal");
 	        $this.destroy();
+        }
+    });
+   }
+});
+
+Q.Sprite.extend("Door", {
+   init: function(p){
+      this._super(p, {sheet: 'door'});
+   	  this.add("2d");
+   	  var $this = this;
+   	  this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
+        if(collision.obj.isA("Player")) {
+            Q.stageScene("endGame",1, {label:"Level 1 Complate",
+                                       button:"Start Next Level"});
+            collision.obj.destroy();
         }
     });
    }

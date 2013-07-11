@@ -45,7 +45,7 @@ Quintus["Popups"] = function(Q) {
             Q.stages[0].lists.QuestionHead[0].off("bump.left");
             delete Q.stages[1];
             Q.stages[0].lists.Player[0].add('platformerControls');
-            Q._extend(Q.stages[0].lists.Player[0].p.items, {"name": "banana"});
+            Q('GuardHead', 0).destroy();
          }
          else{
             Q.stageScene("endGame",1, { label: "You Died" });
@@ -91,9 +91,10 @@ Quintus["Popups"] = function(Q) {
       }));
 
       var button = container.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
-                                                      label: "Play Again" }))
+                                                      label: stage.options.button || "Play Again" }))
       var label = container.insert(new Q.UI.Text({x:10, y: -10 - button.p.h,
-                                                       label: stage.options.label }));
+                                                       label: stage.options.label || "End Game" }));
+      Q('Player',0).destroy();
       button.on("click",function() {
         Q.clearStages();
         Q.stageScene('level1');
@@ -147,12 +148,30 @@ Q.scene('simplePopup',function(stage) {
   container.fit(20);
 });
 
+Q.scene('simplePopup1',function(stage) {
+  var container = stage.insert(new Q.UI.Container({
+    x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+  }));
+
+  var label = container.insert(new Q.UI.Text({x:10, y: -60, label: 'Doors to new level is opened!' }));
+  var button = container.insert(new Q.UI.Button({ x: 0, y: -10, fill: "#CCCCCC",
+                                                  label: "Ok" }))
+  button.on("click", function(){
+  	 container.destroy();
+     Q.stages[0].lists.Player[0].add('platformerControls');
+  })
+
+  container.fit(20);
+});
+
 Q.scene('userPanel',function(stage) {
   var container = stage.insert(new Q.UI.Container({
     x: 40, y: 100, fill: "rgba(0,0,0,0.5)"
   }));
 
   var label = container.insert(new Q.UI.Text({x:10, y: -60, label: 'Items:' }));
+  var crystal = container.insert(new Q.UI.Crystal({ x: -10, y: -30 }))
+  var crystal_count = container.insert(new Q.UI.Text({x:20, y: -30, label: 'x 0' }));
 
   container.fit(20);
 });
