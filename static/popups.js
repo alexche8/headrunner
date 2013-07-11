@@ -1,25 +1,29 @@
 Quintus["Popups"] = function(Q) {
+  var popup_fill = "green";
 
   Q.scene('getAnswer',function(stage) {
 
       var container = stage.insert(new Q.UI.Container({
-        x: Q.width/2 - 150, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+        x: Q.width/2 - 150, y: Q.height/2, fill: popup_fill
       }));
 
-      var button = container.insert(new Q.UI.Button({ x: -18, y: 0, fill: "#CCCCCC",
+      var button = container.insert(new Q.UI.Button({ x: 235, y: 100, fill: "#CCCCCC",
                                                       label: "Confirm" }));
-      var clear = container.insert(new Q.UI.Button({ x: -30, y: 50, fill: "#CCCCCC",
+      var clear = container.insert(new Q.UI.Button({ x: 250, y: 150, fill: "#CCCCCC",
                                                       label: "Clear" }))
                   .on("click", function(){
-                        answer.p.label = "";
+                        answer.p.label = "?";
                   });
-      var answer = container.insert(new Q.UI.Text({x:200, y: 0,
+      var answer = container.insert(new Q.UI.Text({x:120, y: 0,
                                                      label: 'Enter Answer Quickly!',
                                                      fill: "#FFFFFF" }));
-      var timer_label = container.insert(new Q.UI.Text({x:200, y: 50,
+      var answer = container.insert(new Q.UI.Text({x:120, y: 50,
+                                                     label: '?',
+                                                     fill: "#FFFFFF" }));
+      var timer_label = container.insert(new Q.UI.Text({x:230, y: 50,
                                                      label: 'Timer',
                                                      fill: "#FFFFFF" }));
-      var expression = container.insert(new Q.UI.Text({x:100, y: 50,
+      var expression = container.insert(new Q.UI.Text({x:30, y: 50,
                                                      fill: "#FFFFFF" }));
 
       var x = -50, y = 100;
@@ -32,12 +36,16 @@ Quintus["Popups"] = function(Q) {
                 }
                 answer.p.label = answer.p.label + this.p.label;
           });
+          if(key == 4){
+              x -= 250;
+              y = 150;
+          }
           x += 50;
       }
 
       var random_a = Math.floor((Math.random()*100)+1);
       var random_b = Math.floor((Math.random()*100)+1);
-      expression.p.label = random_a.toString() + ' + ' + random_b.toString();
+      expression.p.label = random_a.toString() + ' + ' + random_b.toString() + ' = ';
       random_result = random_a + random_b;
 
       button.on("click",function() {
@@ -46,6 +54,7 @@ Quintus["Popups"] = function(Q) {
             delete Q.stages[1];
             Q.stages[0].lists.Player[0].add('platformerControls');
             Q('GuardHead', 0).destroy();
+            Q.stageScene("level1Boss",0);
          }
          else{
             Q.stageScene("endGame",1, { label: "You Died" });
@@ -87,11 +96,11 @@ Quintus["Popups"] = function(Q) {
 
   Q.scene('endGame',function(stage) {
       var container = stage.insert(new Q.UI.Container({
-        x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+        x: Q.width/2, y: Q.height/2, fill: popup_fill
       }));
 
-      var button = container.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
-                                                      label: stage.options.button || "Play Again" }))
+      var button = container.insert(new Q.UI.Button({ x: 10, y: 0, fill: "#CCCCCC",
+                                                      label: stage.options.button || "Restart" }))
       var label = container.insert(new Q.UI.Text({x:10, y: -10 - button.p.h,
                                                        label: stage.options.label || "End Game" }));
       Q('Player',0).destroy();
@@ -105,13 +114,13 @@ Quintus["Popups"] = function(Q) {
 
   Q.scene('giveKey',function(stage) {
       var container = stage.insert(new Q.UI.Container({
-        x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+        x: Q.width/2, y: Q.height/2, fill: popup_fill
       }));
 
       var button = container.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
                                                       label: "Ok" }))
       var label = container.insert(new Q.UI.Text({x:10, y: -10 - button.p.h,
-                                                       label: 'Give Me 3 crystals and I give you key to doors' }));
+                                                       label: 'Give Me 3 crystals and I unlock the door' }));
       button.on("click",function() {
         container.destroy();
         Q.stages[0].lists.Player[0].add('platformerControls');
@@ -122,7 +131,7 @@ Quintus["Popups"] = function(Q) {
 
 Q.scene('simplePopup',function(stage) {
   var container = stage.insert(new Q.UI.Container({
-    x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+    x: Q.width/2, y: Q.height/2, fill: popup_fill
   }));
   var text;
   var permit = "name" in Q.stages[0].lists.Player[0].p.items &&
@@ -150,7 +159,7 @@ Q.scene('simplePopup',function(stage) {
 
 Q.scene('simplePopup1',function(stage) {
   var container = stage.insert(new Q.UI.Container({
-    x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+    x: Q.width/2, y: Q.height/2, fill: popup_fill
   }));
 
   var label = container.insert(new Q.UI.Text({x:10, y: -60, label: 'Doors to new level is opened!' }));
@@ -166,7 +175,7 @@ Q.scene('simplePopup1',function(stage) {
 
 Q.scene('userPanel',function(stage) {
   var container = stage.insert(new Q.UI.Container({
-    x: 40, y: 100, fill: "rgba(0,0,0,0.5)"
+    x: 50, y: 100, fill: 'green'
   }));
 
   var label = container.insert(new Q.UI.Text({x:10, y: -60, label: 'Items:' }));

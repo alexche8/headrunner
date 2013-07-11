@@ -3,7 +3,7 @@ window.addEventListener("load",function() {
 var Q = window.Q = Quintus()
         .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
         .include("Enemies, Neutral, Items, Popups, CustomUI")
-        .setup({ maximize: true })        
+        .setup({ width: 800, height: 800 })
         .controls().touch()
 
 Q.Sprite.extend("Player",{
@@ -24,7 +24,7 @@ Q.Sprite.extend("Player",{
     this.add('2d, platformerControls');
   },
   update: function(dt) {
-    if(parseInt(this.p.y / 100) * 100 == parseInt(Q.height % 10) * 100 + 300){
+    if(parseInt(this.p.y / 100) * 100 == parseInt(Q.height % 10) * 100 + 500){
         Q.stageScene("endGame",1)
     }
     this.trigger('prestep',dt);
@@ -51,16 +51,10 @@ Q.Sprite.extend("Player",{
 
 });
 
-
-Q.Sprite.extend("Title", {
-    init: function(p) {
-        this._super({
-            y: 150,
-            x: Q.width/2,
- //           asset: "logo.png"
-        });
-    }
+Q.scene('startScreen', function(stage){
+    stage.insert(new Q.Repeater({ asset: "forest.png", speedX: 0, speedY: 0 }));
 });
+
 
 Q.scene("level1",function(stage) {
 
@@ -86,9 +80,7 @@ Q.scene("level1",function(stage) {
   }
 
 
-  //var player = stage.insert(new Q.Player({x:3860,y:20}));
-  var player = stage.insert(new Q.Player({x:300,y:100}));
-  //var player = stage.insert(new Q.Player({x:2324,y:303}));
+  var player = stage.insert(new Q.Player({x:324,y:153}));
 
   stage.add("viewport").follow(player);
   
@@ -118,35 +110,16 @@ Q.scene("level1",function(stage) {
         Q.stage().insert(new Q.Door({x:4600,y:70}));
     }
   } }));
-    
-  
-  
+
+
+
   stage.insert(new Q.BirdHead({ x: 4235, y: 3, vx: 200,left_position: 100, right_position: 500 }));  
- // stage.insert(new Q.BirdHead({ x: 4035, y: 3, vx: 140,left_position: 100, right_position: 500 }));
-  
+
   stage.insert(new Q.Crystal({ x: 2480, y: 50}));
   stage.insert(new Q.Crystal({ x: 3410, y: 300}));
   stage.insert(new Q.Crystal({ x: 4600, y: 250}));
 
-    var container = stage.insert(new Q.UI.Container({
-      fill: "gray",
-      border: 5,
-      shadow: 10,
-      shadowColor: "rgba(0,0,0,0.5)",
-      y: 50,
-      x: Q.width/2,
-      type: Q.SPRITE_UI
-    }));
-
-    stage.insert(new Q.UI.Text({
-      label: "Here's a label\nin a container",
-      color: "white",
-      x: 0,
-      y: 0
-    }),container);
-
-    container.fit(30,30);
-    Q.stageScene("userPanel",2);
+  Q.stageScene("userPanel",2);
 });
 
 Q.load("door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
@@ -162,7 +135,7 @@ Q.load("door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, fore
   Q.sheet("monkeyhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("crystal","crystal.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("door","door1.png", {"sx":0,"sy":0,"tilew":30,"tileh":58,"frames":1});
-  Q.stageScene("level1");
+  Q.stageScene("startScreen");
 });
 
 

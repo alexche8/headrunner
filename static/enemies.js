@@ -7,7 +7,7 @@ Quintus["Enemies"] = function(Q) {
         this.add('2d, aiBounce');
         this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
           if(collision.obj.isA("Player")) {
-            Q.stageScene("endGame",1, { label: "You Died" });
+            Q.stageScene("endGame",1, { label: "Game Over" });
             collision.obj.destroy();
           }
         });
@@ -20,7 +20,7 @@ Quintus["Enemies"] = function(Q) {
          }
       },
       update: function(dt) {
-        if(parseInt(this.p.y / 100) * 100 == parseInt(Q.height % 10) * 100 + 300){
+        if(parseInt(this.p.y / 100) * 100 == parseInt(Q.height % 10) * 100 + 500){
             this.destroy();
         }
         this.trigger('prestep',dt);
