@@ -52,7 +52,18 @@ Q.Sprite.extend("Player",{
 });
 
 Q.scene('startScreen', function(stage){
-    stage.insert(new Q.Repeater({ asset: "forest.png", speedX: 0, speedY: 0 }));
+    stage.insert(new Q.Repeater({ asset: "screen.png", speedX: 0, speedY: 0 }));
+
+    var button = stage.insert(new Q.UI.Button({
+        x: 200,
+        y: 200,
+        label: "Start Game",
+        fill: "#CCCCCC"
+    }));
+    button.on("click", function(){
+        Q.stageScene("level1");
+    })
+
 });
 
 
@@ -122,7 +133,7 @@ Q.scene("level1",function(stage) {
   Q.stageScene("userPanel",2);
 });
 
-Q.load("door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
 
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
@@ -135,6 +146,7 @@ Q.load("door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, fore
   Q.sheet("monkeyhead","questionhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("crystal","crystal.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("door","door1.png", {"sx":0,"sy":0,"tilew":30,"tileh":58,"frames":1});
+  Q.sheet("screen","screen.png", {"sx":0,"sy":0,"tilew":800,"tileh":800,"frames":1});
   Q.stageScene("startScreen");
 });
 
