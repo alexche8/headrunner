@@ -53,7 +53,7 @@ Q.Sprite.extend("Door", {
    	  this.on("bump.left,bump.right,bump.bottom,bump.top",function(collision) {
         if(collision.obj.isA("Player")) {
             Q.stageScene("endGame",1, {label:"Level 1 Complate",
-                                       button:"Start Next Level"});
+                                       button:"Finish"});
             collision.obj.destroy();
         }
     });
