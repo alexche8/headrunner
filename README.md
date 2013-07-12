@@ -1,5 +1,3 @@
-test-q-lib
+Headrunner
 ==========
-o;;
-test-q-lib
-11
+Quintus based html5 game. Idea taken from Quintus platformer demo :)
