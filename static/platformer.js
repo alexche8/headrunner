@@ -1,5 +1,4 @@
 window.addEventListener("load",function() {
-
 var Q = window.Q = Quintus()
         .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
         .include("Enemies, Neutral, Items, Popups, CustomUI")
@@ -11,9 +10,9 @@ Q.Sprite.extend("Player",{
   init: function(p) {
 
     this._super(p, {
-      sheet: "player",  // Setting a sprite sheet sets sprite width and height
-      x: 410,           // You can also set additional properties that can
-      y: 90,             // be overridden on object creation
+      sheet: "player",
+      x: 410,
+      y: 90,
       items: [],
       true_items: {
       	crystal: {
@@ -55,8 +54,8 @@ Q.scene('startScreen', function(stage){
     stage.insert(new Q.Repeater({ asset: "screen.png", speedX: 0, speedY: 0 }));
 
     var button = stage.insert(new Q.UI.Button({
-        x: 200,
-        y: 200,
+        x: 720,
+        y: 700,
         label: "Start Game",
         fill: "#CCCCCC"
     }));
@@ -133,11 +132,10 @@ Q.scene("level1",function(stage) {
   Q.stageScene("userPanel",2);
 });
 
-Q.load("screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, tiles.png", function() {
 
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
-  Q.compileSheets("sprites3.png","sprites.json");
   Q.sheet("player","jumphead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("enemy","dummyhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("birdhead","birdhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});

@@ -135,8 +135,7 @@ Quintus["2D"] = function(Q) {
     load: function(dataAsset) {
       var fileParts = dataAsset.split("."),
         fileExt = fileParts[fileParts.length-1].toLowerCase();
-
-      if (fileExt == "json") {  
+      if (fileExt == "json") {
         var data = Q._isString(dataAsset) ?  Q.asset(dataAsset) : dataAsset;
       }
       else if (fileExt == "tmx" || fileExt == "xml") {
