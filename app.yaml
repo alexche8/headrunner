@@ -1,5 +1,0 @@
-libraries:
-- name: cherry
-  version: latest
-- name: jinja2
-  version: latest
