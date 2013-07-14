@@ -51,10 +51,9 @@ Quintus["Popups"] = function(Q) {
       button.on("click",function() {
          if(parseInt(answer.p.label) == random_result){
             Q.stages[0].lists.QuestionHead[0].off("bump.left");
-            delete Q.stages[2];
+            container.hide();
             Q.stages[0].lists.Player[0].add('platformerControls');
             Q('GuardHead', 0).destroy();
-            Q.stageScene("level1Boss",0);
          }
          else{
             Q.stageScene("endGame",1, { label: "You Died" });
