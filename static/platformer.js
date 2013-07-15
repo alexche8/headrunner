@@ -136,7 +136,7 @@ Q.scene("level1",function(stage) {
   Q.stageScene("userPanel",2);
 });
 
-Q.load("screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
+Q.load("screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, level.json, tiles.png", function() {
 
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
