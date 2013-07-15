@@ -55,8 +55,8 @@ Q.scene('startScreen', function(stage){
     stage.insert(new Q.Repeater({ asset: "screen.png", speedX: 0, speedY: 0 }));
 
     var button = stage.insert(new Q.UI.Button({
-        x: 200,
-        y: 200,
+        x: 700,
+        y: 700,
         label: "Start Game",
         fill: "#CCCCCC"
     }));
