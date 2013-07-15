@@ -1,9 +1,9 @@
 window.addEventListener("load",function() {
 
-var Q = window.Q = Quintus('myGame')
+var Q = window.Q = Quintus()
         .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
         .include("Enemies, Neutral, Items, Popups, CustomUI")
-        .setup({ width: 800, height: 800 })
+        .setup({ width: 800, height: 800 }).setup("myGame")
         .controls().touch()
 
 Q.Sprite.extend("Player",{
