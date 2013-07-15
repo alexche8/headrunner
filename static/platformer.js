@@ -1,8 +1,9 @@
 window.addEventListener("load",function() {
+
 var Q = window.Q = Quintus()
         .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
         .include("Enemies, Neutral, Items, Popups, CustomUI")
-        .setup({ width: 800, height: 800 }).setup("myGame")
+        .setup({ width: 800, height: 800 })
         .controls().touch()
 
 Q.Sprite.extend("Player",{
@@ -11,8 +12,8 @@ Q.Sprite.extend("Player",{
 
     this._super(p, {
       sheet: "player",
-      x: 410,
-      y: 90,
+      x: 720,
+      y: 700,
       items: [],
       true_items: {
       	crystal: {
@@ -38,7 +39,7 @@ Q.Sprite.extend("Player",{
           Q.stage(2).lists['UI.Text'][1].p.label = 'x ' + this.p.true_items.crystal.count;
       }
   },
-  remove_all_item: function(item_name){
+  clear_items: function(item_name){
       this.p.true_items[item_name].count = 0;
       Q.stage(2).lists['UI.Text'][1].p.label = 'x ' + 0;
   },
@@ -54,8 +55,8 @@ Q.scene('startScreen', function(stage){
     stage.insert(new Q.Repeater({ asset: "screen.png", speedX: 0, speedY: 0 }));
 
     var button = stage.insert(new Q.UI.Button({
-        x: 720,
-        y: 700,
+        x: 200,
+        y: 200,
         label: "Start Game",
         fill: "#CCCCCC"
     }));
@@ -94,22 +95,25 @@ Q.scene("level1",function(stage) {
 
   stage.add("viewport").follow(player);
   
-  stage.insert(new Q.DummyHead({ x: 10, y: 0, vx: 203 }));
-  stage.insert(new Q.DummyHead({ x: 70, y: 0, vx: 203 }));
-  stage.insert(new Q.DummyHead({ x: 120, y: 0, vx: 203 }));
+//  stage.insert(new Q.DummyHead({ x: 10, y: 0, vx: 203 }));
+//  stage.insert(new Q.DummyHead({ x: 70, y: 0, vx: 203 }));
+//  stage.insert(new Q.DummyHead({ x: 120, y: 0, vx: 203 }));
+  stage.insert(new Q.DummyHead({ x: 10, y: 0, vx: 103 }));
+  stage.insert(new Q.DummyHead({ x: 70, y: 0, vx: 103 }));
+  stage.insert(new Q.DummyHead({ x: 120, y: 0, vx: 103 }));
   stage.insert(new Q.DummyHead({ x: 1290, y: 203, vx: -204 }));
   stage.insert(new Q.DummyHead({ x: 1335, y: 203, vx: -204 }));
   stage.insert(new Q.DummyHead({ x: 1829, y: 203, vx: 0, name: 'guard'}));
-  stage.insert(new Q.BirdHead({ x: 1835, y: 203, vx: 200,left_position: 100, right_position: 500 }));
+  stage.insert(new Q.BirdHead({ x: 1835, y: 173, vx: 200,left_position: 100, right_position: 500 }));
   stage.insert(new Q.QuestionHead({ x: 2425, y: 303, dialog: 'getAnswer',
   collisionCallback: function(){
 
   }}));
   stage.insert(new Q.GuardHead({ x: 2450, y: 227 }));
 
-  stage.insert(new Q.DummyHead({ x: 2780, y: 200, vx: 40 }));
+ // stage.insert(new Q.DummyHead({ x: 2780, y: 200, vx: 40 }));
   stage.insert(new Q.DummyHead({ x: 3140, y: 200, vx: -30 }));
-  stage.insert(new Q.DummyHead({ x: 3090, y: 200, vx: -20 }));
+//  stage.insert(new Q.DummyHead({ x: 3090, y: 200, vx: -20 }));
   stage.insert(new Q.DummyHead({ x: 3240, y: 200, vx: -50 }));
 
   
@@ -123,7 +127,7 @@ Q.scene("level1",function(stage) {
 
 
 
-  stage.insert(new Q.BirdHead({ x: 4235, y: 3, vx: 200,left_position: 100, right_position: 500 }));  
+ // stage.insert(new Q.BirdHead({ x: 4235, y: 3, vx: 200,left_position: 100, right_position: 500 }));
 
   stage.insert(new Q.Crystal({ x: 2480, y: 50}));
   stage.insert(new Q.Crystal({ x: 3410, y: 300}));
@@ -132,10 +136,11 @@ Q.scene("level1",function(stage) {
   Q.stageScene("userPanel",2);
 });
 
-Q.load("level.json, screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, tiles.png", function() {
+Q.load("screen.png, door1.png, crystal.png, questionhead.png, weapon.png, birdhead.png, forest.png, jumphead1.png, jumphead.png, dummyhead.png, sprites3.png, sprites.json, level.json, tiles.png, background-wall.png", function() {
 
   Q.sheet("tiles","tiles.png", { tilew: 32, tileh: 32 });
 
+  Q.compileSheets("sprites3.png","sprites.json");
   Q.sheet("player","jumphead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("enemy","dummyhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});
   Q.sheet("birdhead","birdhead.png", {"sx":0,"sy":0,"tilew":30,"tileh":24,"frames":1});

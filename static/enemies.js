@@ -64,8 +64,10 @@ Quintus["Enemies"] = function(Q) {
             this.stage.insert(new Q.Weapon({ x: this.p.x, y: this.p.y + 25}))
          }
          var int_position = parseInt(this.p.x / 100) * 100;
-         if(int_position == this.position - this.p.left_position ||
-            int_position == this.position + this.p.right_position){
+//         if(int_position == this.position - this.p.left_position ||
+//            int_position == this.position + this.p.right_position){
+
+         if(int_position == this.position - this.p.left_position){
             this.p.vx = -this.p.vx;
          }
       }

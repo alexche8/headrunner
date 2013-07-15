@@ -161,12 +161,13 @@ Q.scene('simplePopup1',function(stage) {
     x: Q.width/2, y: Q.height/2, fill: popup_fill
   }));
 
-  var label = container.insert(new Q.UI.Text({x:10, y: -60, label: 'Doors to new level is opened!' }));
+  var label = container.insert(new Q.UI.Text({x:10, y: -60, label: 'Doors appears at the end of the level!' }));
   var button = container.insert(new Q.UI.Button({ x: 0, y: -10, fill: "#CCCCCC",
                                                   label: "Ok" }))
   button.on("click", function(){
   	 container.destroy();
      Q.stages[0].lists.Player[0].add('platformerControls');
+     Q('Player').clear_items('crystal');
   })
 
   container.fit(20);
